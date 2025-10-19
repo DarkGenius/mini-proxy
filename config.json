@@ -1,0 +1,22 @@
+{
+  "port": 8787,
+  "routes": {
+    "/agentrouter": "agentrouter"
+  },
+  "targets": {
+    "agentrouter": {
+      "baseUrl": "https://agentrouter.org",
+      "headers": {
+        "User-Agent": "codex_cli_rs/0.47.0 (Linux 5.15.0; x86_64) xterm"
+      }
+    }
+  },
+  "cors": {
+    "origin": "*",
+    "methods": "*",
+    "headers": "*",
+    "exposeHeaders": ""
+  },
+  "stripRequestHeaders": ["host", "content-length"],
+  "streaming": false
+}
