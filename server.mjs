@@ -3,6 +3,7 @@
 
 import http from "node:http";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { Readable } from "node:stream";
 
@@ -55,13 +56,24 @@ const config = loadConfig();
 
 function expandEnvInString(value) {
   if (typeof value !== "string") return value;
-  return value.replace(/\$\{env:([A-Z0-9_]+)\}/g, (_, varName) => {
+  const withEnv = value.replace(/\$\{env:([A-Z0-9_]+)\}/g, (_, varName) => {
     const v = process.env[varName];
     if (v === undefined) {
       console.warn(`[proxy] Переменная окружения ${varName} не установлена`);
       return "";
     }
     return v;
+  });
+  return withEnv.replace(/\$\{file:([^}]+)\}/g, (_, filePath) => {
+    const resolved = filePath.startsWith("~/")
+      ? path.join(os.homedir(), filePath.slice(2))
+      : filePath;
+    try {
+      return fs.readFileSync(resolved, "utf8").trim();
+    } catch {
+      console.warn(`[proxy] Не удалось прочитать файл секрета ${resolved}`);
+      return "";
+    }
   });
 }
 
